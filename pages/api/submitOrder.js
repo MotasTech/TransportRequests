@@ -1,14 +1,13 @@
 import axios from 'axios'; // Import Axios
 
 // pages/api/submitOrder.js
-const GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxlkj0yVujdqfj88oYa_4tHnJRvtGP-HxiuRYxvFNQjhZ8W_fFYbluJba9zUhPLJ35i/exec?email=yes';
+const GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycby6h7JvK09kph_-NOdrca6AFrMfr2hJRxdC3-Tt8C87k5UK4vRqCqvX3Mt7GbiVzlbn/exec?email=yes';
 
 
 export default function handler(req, res) {
   console.log('here')
   if (req.method === 'POST') {
     const { passcode, company, notes, orders } = req.body;
-
 
     axios.post(GOOGLE_ENDPOINT, { passcode, company, notes, orders })
     .then((response) => {
