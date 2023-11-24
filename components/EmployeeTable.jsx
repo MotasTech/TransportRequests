@@ -44,11 +44,11 @@ const OrderTable = () => {
         const companyData = data.slice(1); // Exclude the header row
         
         // Find the row with the matching passcode in column 1
-        const matchingRow = companyData.find((row) => row[0] === passcode);
+        const matchingRow = companyData.find((row) => row[1] === passcode);
   
         if (matchingRow) {
           // If a valid company is found, update the 'company' state with the corresponding value in column 2
-          setCompany(matchingRow[1]);
+          setCompany(matchingRow[0]);
         } else {
           // If no company is found, clear the 'company' state
           setCompany('');
