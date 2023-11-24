@@ -1,7 +1,7 @@
 import axios from 'axios'; // Import Axios
 
 // pages/api/submitOrder.js
-const GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxlkj0yVujdqfj88oYa_4tHnJRvtGP-HxiuRYxvFNQjhZ8W_fFYbluJba9zUhPLJ35i/exec';
+const GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxlkj0yVujdqfj88oYa_4tHnJRvtGP-HxiuRYxvFNQjhZ8W_fFYbluJba9zUhPLJ35i/exec?email=yes';
 
 
 export default function handler(req, res) {
