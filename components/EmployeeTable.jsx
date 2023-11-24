@@ -183,6 +183,11 @@ const OrderTable = () => {
 
     // Show the Bootstrap 5 modal immediately upon submission
     setShowModal(true);
+
+    // create order id using current datetime and passcode
+    const now = new Date();
+    const formattedDate = now.getFullYear() + (now.getMonth() + 1) + now.getDate() + now.getHours() + now.getMinutes() + now.getSeconds();
+    const orderId = 'x' + formattedDate + '-' + passcode
   
     // Create an array to store order data
     const orders = Orders.map((order) => ({
@@ -200,6 +205,7 @@ const OrderTable = () => {
   
     // Create a payload object
     const payload = {
+      orderId: orderId,
       passcode: passcode,
       company: company,
       notes: notes,
