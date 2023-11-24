@@ -87,9 +87,9 @@ const OrderTable = () => {
     updatedOrders[index].auDestinationLicense = auDestinationLicense;
     updatedOrders[index].destinationAddress = destinationAddress;
 
-    updatedOrders[index].isDestinationAddressDisabled = updatedOrders[index].destinationAddress !== '';
-    updatedOrders[index].isMedDisabled = updatedOrders[index].medDestinationLicense !== '';
-    updatedOrders[index].isAuDisabled = updatedOrders[index].auDestinationLicense !== '';
+    updatedOrders[index].isDestinationAddressDisabled = true;
+    updatedOrders[index].isMedDisabled = true;
+    updatedOrders[index].isAuDisabled = true;
   
     setOrders(updatedOrders);
     console.log(Orders)
@@ -108,14 +108,14 @@ const OrderTable = () => {
       const isAuLicenseRequired = e.target.value === 'AU' || e.target.value === 'MED + AU';
   
       // Update the 'required' attribute for the "MED License" and "AU License" inputs
-      order.medLicenseRequired = isMedLicenseRequired;
-      order.auLicenseRequired = isAuLicenseRequired;
+      order.isMedLicenseRequired = isMedLicenseRequired;
+      order.isAuLicenseRequired = isAuLicenseRequired;
 
       // update disabled readonly
-      const isMedDisabled = isMedLicenseRequired && order.medDestinationLicense !== '';
+      /*const isMedDisabled = isMedLicenseRequired && order.medDestinationLicense !== '';
       const isAuDisabled = isAuLicenseRequired && order.auDestinationLicense !== '';
       order.isMedDisabled = isMedDisabled;
-      order.isAuDisabled = isAuDisabled;
+      order.isAuDisabled = isAuDisabled;*/
 
     } else {
       // Handle other property changes
@@ -141,13 +141,18 @@ const OrderTable = () => {
       deliveryDate: newDeliveryDate.toISOString().substr(0, 10),
       newDestination: false,
       destination: '', // Set initial values for new order properties
-      licensesNeeded: '',
+      licensesNeeded: 'Med',
       medDestinationLicense: '',
       auDestinationLicense: '',
       destinationAddress: '',
-      payment_terms: '',
+      payment_terms: 'COD',
       orderSize: '',
       deliveryNotes: '',
+      isMedLicenseRequired: true,
+      isAuLicenseRequired: true,
+      isMedDisabled: true,
+      isAuDisabled: true,
+      isDestinationAddressDisabled: true,
       isEditing: true
     };
 
@@ -162,14 +167,15 @@ const OrderTable = () => {
     var invalidFields = [];
     const tableRow = document.getElementById(`orderRow-${index}`);
     tableRow.querySelectorAll('[required]').forEach((input) => {
-        if (!input.checkValidity()) {
+        console.log(typeof(input.value),'val',input.value + '>',input.name)
+        if (input.value === '' || !input.checkValidity()) {
           // Add the field's name attribute to the list of invalid fields
           invalidFields.push(input.name);
         }
     });
     if (invalidFields.length > 0) {
       // Display an error message and prevent toggling the edit mode
-      alert('Please fill in all required fields before editing.');
+      alert(`Please fill in all required fields before submitting. Invalid fields: \n${invalidFields}.\n If a license field is required and grayed out, you will need to click the Destination Missing link`);
     } else {
       order.isEditing = !order.isEditing;
       setOrders(updatedOrders);
@@ -436,6 +442,9 @@ const OrderTable = () => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 setShowTextInput(false); // Toggle to text input
+                                                Order.isDestinationAddressDisabled = false;
+                                                Order.isMedDisabled = false;
+                                                Order.isAuDisabled = false;
                                             }}
                                             >
                                             Click here
@@ -459,6 +468,9 @@ const OrderTable = () => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 setShowTextInput(true); // Toggle to text input
+                                                Order.isDestinationAddressDisabled = true;
+                                                Order.isMedDisabled = true;
+                                                Order.isAuDisabled = true;
                                             }}
                                             >
                                             Click here
@@ -488,7 +500,7 @@ const OrderTable = () => {
                                         aria-label="Licenses Needed"
                                         required
                                     >
-                                        <option defaultValue value="Med">MED ONLY</option>
+                                        <option value="Med">MED ONLY</option>
                                         <option value="AU">AU ONLY</option>
                                         <option value="MED + AU">MED + AU</option>
                                     </select>
@@ -504,7 +516,7 @@ const OrderTable = () => {
                                         value={Order.medDestinationLicense}
                                         onChange={(e) => handleOrderChange(e, index, 'medDestinationLicense')}
                                         className="form-control form-control-sm"
-                                        required={Order.medLicenseRequired}
+                                        required={Order.isMedLicenseRequired}
                                         readOnly={Order.isMedDisabled}
                                         disabled={Order.isMedDisabled}
                                     />
@@ -520,7 +532,7 @@ const OrderTable = () => {
                                         value={Order.auDestinationLicense}
                                         onChange={(e) => handleOrderChange(e, index, 'auDestinationLicense')}
                                         className="form-control form-control-sm"
-                                        required={Order.auLicenseRequired}
+                                        required={Order.isAuLicenseRequired}
                                         readOnly={Order.isAuDisabled}
                                         disabled={Order.isAuDisabled}
                                     />
@@ -554,7 +566,7 @@ const OrderTable = () => {
                                         aria-label="Order Size"
                                         required
                                     >
-                                        <option defaultValue value="COD">COD</option>
+                                        <option value="COD">COD</option>
                                         <option value="NO COD">NO COD</option>
                                         <option value="UP TO CUSTOMER">UP TO CUSTOMER</option>
                                     </select>
@@ -638,7 +650,7 @@ const OrderTable = () => {
         {/* Successful submission begin */}
         <div id="submissionAlert" className={`text-center fixed-top ${showAlert ? 'd-block' : 'd-none'}`}>
             <div className="alert alert-success" role="alert">
-                <h4 className="alert-heading">REQUEST SUBMITTED"</h4>
+                <h4 className="alert-heading">REQUEST SUBMITTED</h4>
                 <p>Our team has received your request and will follow up shortly!</p>
             </div>
         </div>
