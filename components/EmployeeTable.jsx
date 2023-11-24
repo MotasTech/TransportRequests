@@ -8,9 +8,9 @@ const OrderTable = () => {
   const router = useRouter(); // Initialize the router
 
   const [Orders, setOrders] = useState([
-    { deliveryDate: '2023-11-06', newDestination: false, destination: 'Motas', licensesNeeded: 'AU', medDestinationLicense: 'AB-100-24', auDestinationLicense: 'AB-100-24', destinationAddress: '123 Market Street', payment_terms: 'COD', orderSize:'bin', deliveryNotes: 'Please get us this quickly', isEditing: false },
-    { deliveryDate: '2023-11-06', newDestination: false, destination: 'Motas', licensesNeeded: 'Med', medDestinationLicense: 'AB-100-24', auDestinationLicense: 'AB-100-24', destinationAddress: '123 Market Street', payment_terms: 'COD', orderSize:'bin', deliveryNotes: '', isEditing: false },
-    { deliveryDate: '2023-11-06', newDestination: false, destination: 'Motas', licensesNeeded: 'MED + AU', medDestinationLicense: 'AB-100-24', auDestinationLicense: 'AB-100-24', destinationAddress: '123 Market Street', payment_terms: 'COD', orderSize:'bin', deliveryNotes: '', isEditing: false }
+    //{ deliveryDate: '2023-11-06', newDestination: false, destination: 'Motas', licensesNeeded: 'AU', medDestinationLicense: 'AB-100-24', auDestinationLicense: 'AB-100-24', destinationAddress: '123 Market Street', payment_terms: 'COD', orderSize:'bin', deliveryNotes: 'Please get us this quickly', isEditing: false },
+    //{ deliveryDate: '2023-11-06', newDestination: false, destination: 'Motas', licensesNeeded: 'Med', medDestinationLicense: 'AB-100-24', auDestinationLicense: 'AB-100-24', destinationAddress: '123 Market Street', payment_terms: 'COD', orderSize:'bin', deliveryNotes: '', isEditing: false },
+    //{ deliveryDate: '2023-11-06', newDestination: false, destination: 'Motas', licensesNeeded: 'MED + AU', medDestinationLicense: 'AB-100-24', auDestinationLicense: 'AB-100-24', destinationAddress: '123 Market Street', payment_terms: 'COD', orderSize:'bin', deliveryNotes: '', isEditing: false }
   ]);
 
   // State variable to track whether there are records with isEditing still true
@@ -357,7 +357,7 @@ const OrderTable = () => {
         <div className="row w-50 mx-auto mb-2">
             <div className="col col-auto">
                 <label className="form-label form-label-sm ps-0 fw-bolder text-muted">
-                    Pickup Date <span className="text-danger">*</span>
+                    Pickup Date<span className="text-danger">*</span>
                 </label>
             </div>
             <div className="col">
@@ -394,14 +394,14 @@ const OrderTable = () => {
                 <table className="table table-bordered table-responsive">
                     <thead className="small table-light text-center">
                         <tr>
-                        <th className="col-1 small">Delivery Date <span className="text-danger">*</span></th>
-                        <th className="col-2 small">Destination <span className="text-danger">*</span></th>
-                        <th className="col-1 small">MED / AU <span className="text-danger">*</span></th>
+                        <th className="col-1 small">Delivery Date<span className="text-danger">*</span></th>
+                        <th className="col-2 small">Destination<span className="text-danger">*</span></th>
+                        <th className="col-1 small">MED / AU<span className="text-danger">*</span></th>
                         <th className="col-1 small">MED License</th>
                         <th className="col-1 small">AU License</th>
                         <th className="col-2 small">Destination Address</th>
-                        <th className="col-1 small">Payment Terms <span className="text-danger">*</span></th>
-                        <th className="col-1 small">Order Size <span className="text-danger">*</span></th>
+                        <th className="col-1 small">Payment Terms<span className="text-danger">*</span></th>
+                        <th className="col-1 small">Order Size<span className="text-danger">*</span></th>
                         <th className="col-2 small" colSpan="2">Delivery Notes</th>
                         </tr>
                     </thead>
