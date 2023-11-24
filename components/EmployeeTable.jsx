@@ -60,6 +60,14 @@ const OrderTable = () => {
       console.error('Error:', error);
     }
   };
+
+  
+  function getNextBusinessDay(date) {
+    const nextDay = new Date(date);
+    nextDay.setUTCDate(nextDay.getUTCDate() + 1); // Move to the next day in UTC
+    while (nextDay.getUTCDay() === 0 || nextDay.getUTCDay() === 6) nextDay.setUTCDate(nextDay.getUTCDate() + 1); // Move to the next day if it's a weekend in UTC  
+    return nextDay;
+  }
   
 
   // Function to handle selecting an option from the datalist and populating the destinationAddress
@@ -79,8 +87,12 @@ const OrderTable = () => {
     updatedOrders[index].auDestinationLicense = auDestinationLicense;
     updatedOrders[index].destinationAddress = destinationAddress;
 
+    updatedOrders[index].isDestinationAddressDisabled = updatedOrders[index].destinationAddress !== '';
+    updatedOrders[index].isMedDisabled = updatedOrders[index].medDestinationLicense !== '';
+    updatedOrders[index].isAuDisabled = updatedOrders[index].auDestinationLicense !== '';
   
     setOrders(updatedOrders);
+    console.log(Orders)
   };
 
   const handleOrderChange = (e, index, propertyName) => {
@@ -98,6 +110,13 @@ const OrderTable = () => {
       // Update the 'required' attribute for the "MED License" and "AU License" inputs
       order.medLicenseRequired = isMedLicenseRequired;
       order.auLicenseRequired = isAuLicenseRequired;
+
+      // update disabled readonly
+      const isMedDisabled = isMedLicenseRequired && order.medDestinationLicense !== '';
+      const isAuDisabled = isAuLicenseRequired && order.auDestinationLicense !== '';
+      order.isMedDisabled = isMedDisabled;
+      order.isAuDisabled = isAuDisabled;
+
     } else {
       // Handle other property changes
       order[propertyName] = e.target.value;
@@ -108,9 +127,18 @@ const OrderTable = () => {
   
 
   const handleAddOrder = () => {
+    // Get the pickupDate from the input field
+    const pickupDateInput = document.getElementById('pickupDate');
+    const pickupDate = new Date(pickupDateInput.value);
+    console.log('pickupDateInput',pickupDateInput.value)
+
+    // Check if pickupDate is a valid date, otherwise use today's date
+    const newDeliveryDate = pickupDateInput.value!=='' ? getNextBusinessDay(pickupDate) : new Date();
+    console.log('newDeliveryDate',newDeliveryDate)
     // Logic to add a new order to the state
+    
     const newOrder = {
-      deliveryDate: new Date().toISOString().substr(0, 10),
+      deliveryDate: newDeliveryDate.toISOString().substr(0, 10),
       newDestination: false,
       destination: '', // Set initial values for new order properties
       licensesNeeded: '',
@@ -131,13 +159,15 @@ const OrderTable = () => {
     const order = updatedOrders[index];
 
     // Perform validation for required fields
-    if (
-      order.destination.trim() === '' ||
-      //order.destinationLicense.trim() === '' ||
-      order.destinationAddress.trim() === '' ||
-      order.payment_terms.trim() === '' ||
-      order.orderSize.trim() === ''
-    ) {
+    var invalidFields = [];
+    const tableRow = document.getElementById(`orderRow-${index}`);
+    tableRow.querySelectorAll('[required]').forEach((input) => {
+        if (!input.checkValidity()) {
+          // Add the field's name attribute to the list of invalid fields
+          invalidFields.push(input.name);
+        }
+    });
+    if (invalidFields.length > 0) {
       // Display an error message and prevent toggling the edit mode
       alert('Please fill in all required fields before editing.');
     } else {
@@ -475,6 +505,8 @@ const OrderTable = () => {
                                         onChange={(e) => handleOrderChange(e, index, 'medDestinationLicense')}
                                         className="form-control form-control-sm"
                                         required={Order.medLicenseRequired}
+                                        readOnly={Order.isMedDisabled}
+                                        disabled={Order.isMedDisabled}
                                     />
                                 ) : (
                                     Order.medDestinationLicense
@@ -489,6 +521,8 @@ const OrderTable = () => {
                                         onChange={(e) => handleOrderChange(e, index, 'auDestinationLicense')}
                                         className="form-control form-control-sm"
                                         required={Order.auLicenseRequired}
+                                        readOnly={Order.isAuDisabled}
+                                        disabled={Order.isAuDisabled}
                                     />
                                 ) : (
                                     Order.auDestinationLicense
@@ -503,6 +537,8 @@ const OrderTable = () => {
                                         onChange={(e) => handleOrderChange(e, index, 'destinationAddress')}
                                         className="form-control form-control-sm required"
                                         required
+                                        readOnly={Order.isDestinationAddressDisabled}
+                                        disabled={Order.isDestinationAddressDisabled}
                                     />
                                 ) : (
                                     Order.destinationAddress
