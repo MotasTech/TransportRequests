@@ -75,10 +75,10 @@ const OrderTable = () => {
     const auDestinationLicense = (matchingOption && matchingOption[2]) || '';
     const destinationAddress = (matchingOption && matchingOption[3]) || '';
   
+    updatedOrders[index].medDestinationLicense = medDestinationLicense;
+    updatedOrders[index].auDestinationLicense = auDestinationLicense;
     updatedOrders[index].destinationAddress = destinationAddress;
-  
-    // Set the 'disabled' attribute if destinationAddress is not empty
-    updatedOrders[index].destinationAddressDisabled = updatedOrders[index].destinationAddress === '';
+
   
     setOrders(updatedOrders);
   };
@@ -315,7 +315,7 @@ const OrderTable = () => {
         <div className="row w-50 mx-auto mb-2">
             <div className="col col-auto">
                 <label className="form-label form-label-sm ps-0 fw-bolder text-muted">
-                    Pickup Date
+                    Pickup Date <span className="text-danger">*</span>
                 </label>
             </div>
             <div className="col">
@@ -350,17 +350,17 @@ const OrderTable = () => {
                     </div>
                 </div>
                 <table className="table table-bordered table-responsive">
-                    <thead className="small table-light">
+                    <thead className="small table-light text-center">
                         <tr>
-                        <th className="col-1">Delivery Date</th>
-                        <th className="col-2">Destination</th>
-                        <th className="col-1">MED / AU</th>
-                        <th className="col-1">MED License</th>
-                        <th className="col-1">AU License</th>
-                        <th className="col-2">Destination Address</th>
-                        <th className="col-1">Payment Terms</th>
-                        <th className="col-1">Order Size</th>
-                        <th className="col-2" colSpan="2">Delivery Notes</th>
+                        <th className="col-1 small">Delivery Date <span className="text-danger">*</span></th>
+                        <th className="col-2 small">Destination <span className="text-danger">*</span></th>
+                        <th className="col-1 small">MED / AU <span className="text-danger">*</span></th>
+                        <th className="col-1 small">MED License</th>
+                        <th className="col-1 small">AU License</th>
+                        <th className="col-2 small">Destination Address</th>
+                        <th className="col-1 small">Payment Terms <span className="text-danger">*</span></th>
+                        <th className="col-1 small">Order Size <span className="text-danger">*</span></th>
+                        <th className="col-2 small" colSpan="2">Delivery Notes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -384,6 +384,7 @@ const OrderTable = () => {
                                 {Order.isEditing ? (
                                     <div>
                                     {showTextInput ? ( // Conditionally render based on showTextInput state
+                                        <>
                                         <input
                                             name={`Destination ${index}`}
                                             className="form-control form-control-sm"
@@ -392,6 +393,19 @@ const OrderTable = () => {
                                             placeholder="Search by name or license number"
                                             required
                                         />
+                                        <small className="text-muted text-very-small">
+                                            Lookup destination{' '}
+                                            <a
+                                            href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                setShowTextInput(false); // Toggle to text input
+                                            }}
+                                            >
+                                            Click here
+                                            </a>
+                                        </small>
+                                        </>
                                     ) : (
                                         <>
                                         <input
@@ -417,7 +431,7 @@ const OrderTable = () => {
                                         <datalist id="datalistOptions">
                                             {DatalistOptions.map((option, idx) => (
                                                 <option key={idx} value={option[0]}>
-                                                    {`MED:${option[1]} | AU:${option[2]}`}
+                                                    {`${option[1]} | ${option[2]}`}
                                                 </option>
                                             ))}
                                         </datalist>
@@ -438,8 +452,7 @@ const OrderTable = () => {
                                         aria-label="Licenses Needed"
                                         required
                                     >
-                                        <option defaultValue>Licenses in Order</option>
-                                        <option value="Med">MED ONLY</option>
+                                        <option defaultValue value="Med">MED ONLY</option>
                                         <option value="AU">AU ONLY</option>
                                         <option value="MED + AU">MED + AU</option>
                                     </select>
@@ -455,10 +468,10 @@ const OrderTable = () => {
                                         value={Order.medDestinationLicense}
                                         onChange={(e) => handleOrderChange(e, index, 'medDestinationLicense')}
                                         className="form-control form-control-sm"
-                                        disabled readOnly required={Order.auLicenseRequired}
+                                        required={Order.medLicenseRequired}
                                     />
                                 ) : (
-                                    Order.destinationLicense
+                                    Order.medDestinationLicense
                                 )}
                             </td>
                             <td>
@@ -469,7 +482,7 @@ const OrderTable = () => {
                                         value={Order.auDestinationLicense}
                                         onChange={(e) => handleOrderChange(e, index, 'auDestinationLicense')}
                                         className="form-control form-control-sm"
-                                        disabled readOnly required={Order.auLicenseRequired}
+                                        required={Order.auLicenseRequired}
                                     />
                                 ) : (
                                     Order.auDestinationLicense
@@ -483,7 +496,7 @@ const OrderTable = () => {
                                         value={Order.destinationAddress}
                                         onChange={(e) => handleOrderChange(e, index, 'destinationAddress')}
                                         className="form-control form-control-sm required"
-                                        disabled readOnly required
+                                        required
                                     />
                                 ) : (
                                     Order.destinationAddress
@@ -499,8 +512,7 @@ const OrderTable = () => {
                                         aria-label="Order Size"
                                         required
                                     >
-                                        <option defaultValue>Payment Terms</option>
-                                        <option value="COD">COD</option>
+                                        <option defaultValue value="COD">COD</option>
                                         <option value="NO COD">NO COD</option>
                                         <option value="UP TO CUSTOMER">UP TO CUSTOMER</option>
                                     </select>
@@ -584,10 +596,8 @@ const OrderTable = () => {
         {/* Successful submission begin */}
         <div id="submissionAlert" className={`text-center fixed-top ${showAlert ? 'd-block' : 'd-none'}`}>
             <div className="alert alert-success" role="alert">
-                <h4 className="alert-heading">Success!</h4>
-                <p>The Motasmi Team received your transport requests and will provide a status update shortly</p>
-                <hr/>
-                <p className="mb-0">If you have any questions or concerns, please email us <a href="mailto:orders@motasmi.com">orders@motasmi.com</a> or call <a href="tel:2488508502">248.850.8502</a></p>
+                <h4 className="alert-heading">REQUEST SUBMITTED"</h4>
+                <p>Our team has received your request and will follow up shortly!</p>
             </div>
         </div>
         {/* Successful submission end */}

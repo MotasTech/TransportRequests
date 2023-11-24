@@ -15,7 +15,7 @@ export default function Home() {
       <div className="bg-dark mb-0">
         <main className="mb-0 pt-0 pb-2">
           <img src="/Motas-logo-primary-white.png" className="w-25 py-2 mt-5 mb-3" />
-          <h2 className="text-white">TRANSPORT REQUESTS</h2>
+          <h2 className="text-white">TRANSPORT REQUEST</h2>
         </main>
       </div>
 
