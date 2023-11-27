@@ -111,12 +111,6 @@ const OrderTable = () => {
       order.isMedLicenseRequired = isMedLicenseRequired;
       order.isAuLicenseRequired = isAuLicenseRequired;
 
-      // update disabled readonly
-      /*const isMedDisabled = isMedLicenseRequired && order.medDestinationLicense !== '';
-      const isAuDisabled = isAuLicenseRequired && order.auDestinationLicense !== '';
-      order.isMedDisabled = isMedDisabled;
-      order.isAuDisabled = isAuDisabled;*/
-
     } else {
       // Handle other property changes
       order[propertyName] = e.target.value;
@@ -442,9 +436,9 @@ const OrderTable = () => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 setShowTextInput(false); // Toggle to text input
-                                                Order.isDestinationAddressDisabled = false;
-                                                Order.isMedDisabled = false;
-                                                Order.isAuDisabled = false;
+                                                Order.isDestinationAddressDisabled = true;
+                                                Order.isMedDisabled = true;
+                                                Order.isAuDisabled = true;
                                             }}
                                             >
                                             Click here
@@ -468,9 +462,9 @@ const OrderTable = () => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 setShowTextInput(true); // Toggle to text input
-                                                Order.isDestinationAddressDisabled = true;
-                                                Order.isMedDisabled = true;
-                                                Order.isAuDisabled = true;
+                                                Order.isDestinationAddressDisabled = false;
+                                                Order.isMedDisabled = false;
+                                                Order.isAuDisabled = false;
                                             }}
                                             >
                                             Click here
@@ -509,7 +503,8 @@ const OrderTable = () => {
                                 )}
                             </td>
                             <td>
-                                {Order.isEditing ? (
+                                {Order.isMedLicenseRequired ? (
+                                    Order.isEditing ? (
                                     <input
                                         name={`MED License ${index}`}
                                         type="text"
@@ -520,12 +515,16 @@ const OrderTable = () => {
                                         readOnly={Order.isMedDisabled}
                                         disabled={Order.isMedDisabled}
                                     />
-                                ) : (
+                                    ) : (
                                     Order.medDestinationLicense
+                                    )
+                                ) : (
+                                    null
                                 )}
                             </td>
                             <td>
-                                {Order.isEditing ? (
+                                {Order.isAuLicenseRequired ? (
+                                    Order.isEditing ? (
                                     <input
                                         name={`AU License ${index}`}
                                         type="text"
@@ -536,8 +535,11 @@ const OrderTable = () => {
                                         readOnly={Order.isAuDisabled}
                                         disabled={Order.isAuDisabled}
                                     />
-                                ) : (
+                                    ) : (
                                     Order.auDestinationLicense
+                                    )
+                                ) : (
+                                    null
                                 )}
                             </td>
                             <td>
