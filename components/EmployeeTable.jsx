@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-const DESTINATIONS_GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxlkj0yVujdqfj88oYa_4tHnJRvtGP-HxiuRYxvFNQjhZ8W_fFYbluJba9zUhPLJ35i/exec';
-const ORDERS_AND_PASSCODE_ENDPOINT = 'https://script.google.com/macros/s/AKfycby6h7JvK09kph_-NOdrca6AFrMfr2hJRxdC3-Tt8C87k5UK4vRqCqvX3Mt7GbiVzlbn/exec';
+//const DESTINATIONS_GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxlkj0yVujdqfj88oYa_4tHnJRvtGP-HxiuRYxvFNQjhZ8W_fFYbluJba9zUhPLJ35i/exec';
+//const ORDERS_AND_PASSCODE_ENDPOINT = 'https://script.google.com/macros/s/AKfycby6h7JvK09kph_-NOdrca6AFrMfr2hJRxdC3-Tt8C87k5UK4vRqCqvX3Mt7GbiVzlbn/exec';
+const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS_ENDPOINT;
+const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
+console.log('GOOGLE_DESTINATIONS_ENDPOINT',GOOGLE_DESTINATIONS_ENDPOINT)
 
 const OrderTable = () => {
   const router = useRouter(); // Initialize the router
@@ -38,7 +41,7 @@ const OrderTable = () => {
 
   const fetchCompanyByPasscode = async (passcode) => {
     try {
-      const response = await fetch(`${ORDERS_AND_PASSCODE_ENDPOINT}?type=passcodes&code=chris`);
+      const response = await fetch(`${GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT}?type=passcodes&code=chris`);
       if (response.ok) {
         const data = await response.json();
         const companyData = data.slice(1); // Exclude the header row
@@ -235,13 +238,14 @@ const OrderTable = () => {
   
     // Create a payload object
     const payload = {
-      orderId: orderId,
+      orderId: orderId.toString(),
       passcode: passcode,
       company: company,
       notes: notes,
-      pickupDate: pickupDate,
+      pickupDate: pickupDate.toString(),
       orders
     };
+    console.log(JSON.stringify(payload))
   
     try {
       // Send the payload to the API route on the server
@@ -310,7 +314,7 @@ const OrderTable = () => {
     const fetchDestinationsData = async () => {
       try {
         // Make an API request to fetch the datalist options
-        const response = await fetch(DESTINATIONS_GOOGLE_ENDPOINT);
+        const response = await fetch(GOOGLE_DESTINATIONS_ENDPOINT);
         if (response.ok) {
           const data = await response.json();
 
