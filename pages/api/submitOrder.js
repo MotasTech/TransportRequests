@@ -13,6 +13,7 @@ export default function handler(req, res) {
 
     axios.post(GOOGLE_ENDPOINT, { passcode, company, notes, orders })
     .then((response) => {
+      console.log('Google Response',response);
       res.status(response.status).json(response.data);
     })
     .catch((error) => {
