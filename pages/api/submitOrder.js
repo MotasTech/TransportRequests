@@ -20,7 +20,7 @@ export default function handler(req, res) {
     });
 
     // For this example, we're just sending a success response
-    res.status(200).json({ success: true });
+    //res.status(200).json({ success: true });
   } else {
     // Return an error for other HTTP methods
     res.status(405).json({ error: 'Method Not Allowed' });
