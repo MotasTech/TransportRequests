@@ -114,6 +114,10 @@ const OrderTable = () => {
       order.isMedLicenseRequired = isMedLicenseRequired;
       order.isAuLicenseRequired = isAuLicenseRequired;
 
+      // clear values if not needed
+      if(!order.isMedLicenseRequired) order.medDestinationLicense = ''
+      if(!order.isAuLicenseRequired) order.auDestinationLicense = ''
+
     } else {
       // Handle other property changes
       order[propertyName] = e.target.value;
