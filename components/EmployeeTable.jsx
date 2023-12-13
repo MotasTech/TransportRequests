@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-//const DESTINATIONS_GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxlkj0yVujdqfj88oYa_4tHnJRvtGP-HxiuRYxvFNQjhZ8W_fFYbluJba9zUhPLJ35i/exec';
-//const ORDERS_AND_PASSCODE_ENDPOINT = 'https://script.google.com/macros/s/AKfycby6h7JvK09kph_-NOdrca6AFrMfr2hJRxdC3-Tt8C87k5UK4vRqCqvX3Mt7GbiVzlbn/exec';
 const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS_ENDPOINT;
 const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
-console.log('GOOGLE_DESTINATIONS_ENDPOINT',GOOGLE_DESTINATIONS_ENDPOINT)
 
 const OrderTable = () => {
   const router = useRouter(); // Initialize the router
@@ -19,7 +16,6 @@ const OrderTable = () => {
   // State variable to track whether there are records with isEditing still true
   const hasUnfinishedEdits = Orders.some((Order) => Order.isEditing);
   const [showModal, setShowModal] = useState(false);  // State variable to control the visibility of the modal
-  const [showTextInput, setShowTextInput] = useState(false); // State variable to toggle input type
   const [DatalistOptions, setDatalistOptions] = useState([]); // State variable to store datalist options
   const [passcode, setPasscode] = useState('');
   const [company, setCompany] = useState('');
@@ -38,6 +34,23 @@ const OrderTable = () => {
       setShowAlert(false);
     }, duration);
   };
+
+  
+  const toggleLookupDestination = (index) => {
+    setOrders(Orders.map((order, idx) => {
+      if (idx === index) {
+        return {
+          ...order,
+          isLookupDestination: !order.isLookupDestination,
+          isDestinationAddressDisabled: !order.isLookupDestination,
+          isMedDisabled: !order.isLookupDestination,
+          isAuDisabled: !order.isLookupDestination
+        };
+      }
+      return order;
+    }));
+  };
+
 
   const fetchCompanyByPasscode = async (passcode) => {
     try {
@@ -107,7 +120,7 @@ const OrderTable = () => {
       order[propertyName] = e.target.value;
   
       // Determine which licenses are required based on the selected value
-      const isMedLicenseRequired = e.target.value === 'Med' || e.target.value === 'MED + AU';
+      const isMedLicenseRequired = e.target.value === 'MED' || e.target.value === 'MED + AU';
       const isAuLicenseRequired = e.target.value === 'AU' || e.target.value === 'MED + AU';
   
       // Update the 'required' attribute for the "MED License" and "AU License" inputs
@@ -115,8 +128,8 @@ const OrderTable = () => {
       order.isAuLicenseRequired = isAuLicenseRequired;
 
       // clear values if not needed
-      if(!order.isMedLicenseRequired) order.medDestinationLicense = ''
-      if(!order.isAuLicenseRequired) order.auDestinationLicense = ''
+      //if(!order.isMedLicenseRequired) order.medDestinationLicense = ''
+      //if(!order.isAuLicenseRequired) order.auDestinationLicense = ''
 
     } else {
       // Handle other property changes
@@ -142,13 +155,14 @@ const OrderTable = () => {
       deliveryDate: newDeliveryDate.toISOString().substr(0, 10),
       newDestination: false,
       destination: '', // Set initial values for new order properties
-      licensesNeeded: 'Med',
+      licensesNeeded: 'MED + AU',
       medDestinationLicense: '',
       auDestinationLicense: '',
       destinationAddress: '',
       payment_terms: 'COD',
       orderSize: '',
       deliveryNotes: '',
+      isLookupDestination: true,
       isMedLicenseRequired: true,
       isAuLicenseRequired: true,
       isMedDisabled: true,
@@ -196,6 +210,12 @@ const OrderTable = () => {
     const notes = document.getElementById('notes').value;
     const pickupDate = document.getElementById('pickupDate').value;
 
+    // Check if company exists
+    if(company == '') {
+        alert(`You did not access this portal from your personal link. Please revisit the page from the link provided to your company.`);
+        return;
+    }
+
     // Check if at least one order in table
     if(Orders.length == 0) {
         alert(`You need to add at least one request`);
@@ -232,8 +252,8 @@ const OrderTable = () => {
       newDestination: order.newDestination,
       destination: order.destination,
       licensesNeeded: order.licensesNeeded,
-      medDestinationLicense: order.medDestinationLicense,
-      auDestinationLicense: order.auDestinationLicense,
+      medDestinationLicense: (order.licensesNeeded == 'MED' || order.licensesNeeded == 'MED + AU') ? order.medDestinationLicense : '',
+      auDestinationLicense: (order.licensesNeeded == 'AU' || order.licensesNeeded == 'MED + AU') ? order.auDestinationLicense : '',
       destinationAddress: order.destinationAddress,
       paymentTerms: order.payment_terms,
       orderSize: order.orderSize,
@@ -426,58 +446,40 @@ const OrderTable = () => {
                             </td>
                             <td>
                                 {Order.isEditing ? (
-                                    <div>
-                                    {showTextInput ? ( // Conditionally render based on showTextInput state
-                                        <>
-                                        <input
-                                            name={`Destination ${index}`}
-                                            className="form-control form-control-sm"
-                                            value={Order.destination}
-                                            onChange={(e) => handleOrderChange(e, index, 'destination')}
-                                            placeholder="Search by name or license number"
-                                            required
-                                        />
+                                    <div>  
+                                        {Order.isLookupDestination ? (
+                                            <input
+                                                name={`Destination ${index}`}
+                                                className="form-control form-control-sm"
+                                                list="datalistOptions"
+                                                value={Order.destination}
+                                                onChange={(e) => handleSelectOption(index, e.target.value)}
+                                                placeholder="Enter Destination Name"
+                                            />
+                                            ) : (
+                                            <>
+                                            <input
+                                                name={`Destination ${index}`}
+                                                className="form-control form-control-sm"
+                                                value={Order.destination}
+                                                onChange={(e) => handleOrderChange(e, index, 'destination')}
+                                                placeholder="Search by name or license number"
+                                                required
+                                            />
+                                            </>
+                                        )}                                      
                                         <small className="text-muted text-very-small">
-                                            Lookup destination{' '}
+                                            {Order.isLookupDestination ? "Destination missing?" : "To lookup destination,"}{' '}
                                             <a
                                             href="#"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                setShowTextInput(false); // Toggle to text input
-                                                Order.isDestinationAddressDisabled = true;
-                                                Order.isMedDisabled = true;
-                                                Order.isAuDisabled = true;
+                                                toggleLookupDestination(index);
                                             }}
                                             >
                                             Click here
                                             </a>
-                                        </small>
-                                        </>
-                                    ) : (
-                                        <>
-                                        <input
-                                            name={`Destination ${index}`}
-                                            className="form-control form-control-sm"
-                                            list="datalistOptions"
-                                            value={Order.destination}
-                                            onChange={(e) => handleSelectOption(index, e.target.value)}
-                                            placeholder="Search by name or license number"
-                                        />
-                                        <small className="text-muted text-very-small">
-                                            Destination missing?{' '}
-                                            <a
-                                            href="#"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setShowTextInput(true); // Toggle to text input
-                                                Order.isDestinationAddressDisabled = false;
-                                                Order.isMedDisabled = false;
-                                                Order.isAuDisabled = false;
-                                            }}
-                                            >
-                                            Click here
-                                            </a>
-                                        </small>
+                                        </small>   
                                         <datalist id="datalistOptions">
                                             {DatalistOptions.map((option, idx) => (
                                                 <option key={idx} value={option[0]}>
@@ -485,13 +487,11 @@ const OrderTable = () => {
                                                 </option>
                                             ))}
                                         </datalist>
-                                        </>
-                                    )}
                                     </div>
                                 ) : (
                                     Order.destination
                                 )}
-                                </td>
+                            </td>
                             <td>
                                 {Order.isEditing ? (
                                     <select
@@ -502,7 +502,7 @@ const OrderTable = () => {
                                         aria-label="Licenses Needed"
                                         required
                                     >
-                                        <option value="Med">MED ONLY</option>
+                                        <option value="MED">MED ONLY</option>
                                         <option value="AU">AU ONLY</option>
                                         <option value="MED + AU">MED + AU</option>
                                     </select>

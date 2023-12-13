@@ -30,7 +30,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Terms go here
+          
         </a>
       </footer>
 
