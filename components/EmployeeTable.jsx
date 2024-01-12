@@ -379,7 +379,7 @@ const OrderTable = () => {
         <div className="row w-50 mx-auto mb-2 d-flex align-items-center">
             <div class="mb-3 row">
               <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">
-                Pickup Date<span className="text-danger">*</span>
+                Pickup date<span className="text-danger">*</span>
               </label>
               <div class="col-sm-8">
                 <input id="pickupDate" name="Pickup Date" className="form-control" type="date" required />
@@ -388,7 +388,7 @@ const OrderTable = () => {
         </div>
         <div className="row w-50 mx-auto mb-2 d-flex align-items-center">
             <div class="mb-3 row">
-              <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">General Pickup Notes</label>
+              <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">General pickup notes</label>
               <div class="col-sm-8">
                 <input id="notes" className="form-control" type="text" placeholder="Notes about orders" aria-label="default input example" />
               </div>
@@ -414,14 +414,14 @@ const OrderTable = () => {
                 <table className="table table-bordered table-responsive">
                     <thead className="small table-light text-center">
                         <tr>
-                        <th className="col-1 small">Delivery Date<span className="text-danger">*</span></th>
+                        <th className="col-1 small">Delivery date<span className="text-danger">*</span></th>
                         <th className="col-2 small">Destination<span className="text-danger">*</span></th>
                         <th className="col-1 small">MED / AU<span className="text-danger">*</span></th>
                         <th className="col-1 small">MED License</th>
                         <th className="col-1 small">AU License</th>
-                        <th className="col-2 small">Destination Address</th>
-                        <th className="col-1 small">Payment Terms<span className="text-danger">*</span></th>
-                        <th className="col-1 small">Order Size<span className="text-danger">*</span></th>
+                        <th className="col-2 small">Destination address</th>
+                        <th className="col-1 small">Payment terms<span className="text-danger">*</span></th>
+                        <th className="col-1 small">Order size<span className="text-danger">*</span></th>
                         <th className="col-2 small" colSpan="2">Notes <br /> <small className="non-bold">(Fresh Frozen, Brand identifier, Fragile, etc.)</small></th>
                         </tr>
                     </thead>
