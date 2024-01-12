@@ -172,6 +172,8 @@ const OrderTable = () => {
     };
 
     setOrders((prevOrders) => [...prevOrders, newOrder]);
+
+    console.log('Orders',Orders);
   };
 
   const handleEditOrder = (index) => {
@@ -446,6 +448,7 @@ const OrderTable = () => {
                                 {Order.isEditing ? (
                                     <div>  
                                         {Order.isLookupDestination ? (
+                                          <>
                                             <input
                                                 name={`Destination ${index}`}
                                                 className="form-control form-control-sm"
@@ -454,6 +457,8 @@ const OrderTable = () => {
                                                 onChange={(e) => handleSelectOption(index, e.target.value)}
                                                 placeholder="Enter Destination Name"
                                             />
+                                            {Order.newDestination = false}
+                                            </>
                                             ) : (
                                             <>
                                             <input
@@ -464,6 +469,7 @@ const OrderTable = () => {
                                                 placeholder="Search by name or license number"
                                                 required
                                             />
+                                            {Order.newDestination = true}
                                             </>
                                         )}                                      
                                         <small className="text-muted text-very-small">
