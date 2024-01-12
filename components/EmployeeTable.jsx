@@ -163,7 +163,7 @@ const OrderTable = () => {
       orderSize: '',
       deliveryNotes: '',
       isLookupDestination: true,
-      isMedLicenseRequired: true,
+      isMedLicenseRequired: false,
       isAuLicenseRequired: true,
       isMedDisabled: true,
       isAuDisabled: true,
