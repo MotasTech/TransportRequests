@@ -155,7 +155,7 @@ const OrderTable = () => {
       deliveryDate: newDeliveryDate.toISOString().substr(0, 10),
       newDestination: false,
       destination: '', // Set initial values for new order properties
-      licensesNeeded: 'MED + AU',
+      licensesNeeded: 'AU',
       medDestinationLicense: '',
       auDestinationLicense: '',
       destinationAddress: '',
@@ -376,24 +376,22 @@ const OrderTable = () => {
                 <input id="company" name="Company" className="form-control" type="text" aria-label="default input example" value={company} required readOnly disabled />
             </div>
         </div>
-        <div className="row w-50 mx-auto mb-2">
-            <div className="col col-auto">
-                <label className="form-label form-label-sm ps-0 fw-bolder text-muted">
-                    Pickup Date<span className="text-danger">*</span>
-                </label>
-            </div>
-            <div className="col">
+        <div className="row w-50 mx-auto mb-2 d-flex align-items-center">
+            <div class="mb-3 row">
+              <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">
+                Pickup Date<span className="text-danger">*</span>
+              </label>
+              <div class="col-sm-8">
                 <input id="pickupDate" name="Pickup Date" className="form-control" type="date" required />
+              </div>
             </div>
         </div>
-        <div className="row w-50 mx-auto mb-2">
-            <div className="col col-auto">
-                <label className="form-label form-label-sm ps-0 fw-bolder text-muted">
-                    General Pickup Notes
-                </label>
-            </div>
-            <div className="col">
+        <div className="row w-50 mx-auto mb-2 d-flex align-items-center">
+            <div class="mb-3 row">
+              <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">General Pickup Notes</label>
+              <div class="col-sm-8">
                 <input id="notes" className="form-control" type="text" placeholder="Notes about orders" aria-label="default input example" />
+              </div>
             </div>
         </div>
         <div className="row w-50 mx-auto mb-5 text-center text-muted">
@@ -424,7 +422,7 @@ const OrderTable = () => {
                         <th className="col-2 small">Destination Address</th>
                         <th className="col-1 small">Payment Terms<span className="text-danger">*</span></th>
                         <th className="col-1 small">Order Size<span className="text-danger">*</span></th>
-                        <th className="col-2 small" colSpan="2">Delivery Notes</th>
+                        <th className="col-2 small" colSpan="2">Notes <br /> <small className="non-bold">(Fresh Frozen, Brand identifier, Fragile, etc.)</small></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -502,8 +500,8 @@ const OrderTable = () => {
                                         aria-label="Licenses Needed"
                                         required
                                     >
-                                        <option value="MED">MED ONLY</option>
                                         <option value="AU">AU ONLY</option>
+                                        <option value="MED">MED ONLY</option>
                                         <option value="MED + AU">MED + AU</option>
                                     </select>
                                 ) : (
