@@ -425,7 +425,7 @@ const OrderTable = () => {
                               onClick={handleAddOrder}
                               disabled={pickupDateInputValue === ''}
                             >
-                              <i className="bi bi-plus"></i> Add New Request
+                              <i className="bi bi-plus"></i> Add New Order
                             </button>
                             </span>
                             </Tooltip>
