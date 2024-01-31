@@ -3,6 +3,13 @@ import styles from '../styles/Home.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import EmployeeTable from '../components/EmployeeTable';
+import { Raleway } from 'next/font/google'
+
+const raleway = Raleway({ 
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+})
 
 export default function Home() {
   return (
@@ -15,7 +22,7 @@ export default function Home() {
       <div className="bg-dark mb-0">
         <main className="mb-0 pt-0 pb-2">
           <img src="/Motas-logo-primary-white.png" className="w-25 py-2 mt-5 mb-3" />
-          <h2 className="text-white">TRANSPORT REQUEST</h2>
+          <h2 className={`text-white ${raleway.className}`} style={{ fontWeight: 700 }}>TRANSPORT REQUEST</h2>
         </main>
       </div>
 
