@@ -22,6 +22,8 @@ const OrderTable = () => {
   const [showAlert, setShowAlert] = useState(false); // alert for submission
   const [alertType, setAlertType] = useState('success'); // 'success' or 'error'
   const [alertMessage, setAlertMessage] = useState(''); // alert for submission
+  const [pickupDateInputValue, setPickupDateInputValue] = useState('');
+
 
   // Function to show the alert for a specified duration
   const showAlertWithTimeout = (type, message, duration = 10000) => {
@@ -140,14 +142,10 @@ const OrderTable = () => {
   };
   
 
-  const handleAddOrder = () => {
-    // Get the pickupDate from the input field
-    const pickupDateInput = document.getElementById('pickupDate');
-    const pickupDate = new Date(pickupDateInput.value);
-    console.log('pickupDateInput',pickupDateInput.value)
+  const handleAddOrder = () => {    
 
     // Check if pickupDate is a valid date, otherwise use today's date
-    const newDeliveryDate = pickupDateInput.value!=='' ? getNextBusinessDay(pickupDate) : new Date();
+    const newDeliveryDate = pickupDateInputValue!=='' ? getNextBusinessDay(new Date(pickupDateInputValue)) : new Date();
     console.log('newDeliveryDate',newDeliveryDate)
     // Logic to add a new order to the state
     
@@ -210,7 +208,7 @@ const OrderTable = () => {
     const passcode = document.getElementById('passcode').value;
     const company = document.getElementById('company').value;
     const notes = document.getElementById('notes').value;
-    const pickupDate = document.getElementById('pickupDate').value;
+    const pickupDate = pickupDateInputValue;
 
     // Check if company exists
     if(company == '') {
@@ -379,19 +377,27 @@ const OrderTable = () => {
             </div>
         </div>
         <div className="row w-50 mx-auto mb-2 d-flex align-items-center">
-            <div class="mb-3 row">
-              <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">
+            <div className="mb-3 row">
+              <label className="col-sm-4 col-form-label small fw-bolder">
                 Pickup date<span className="text-danger">*</span>
               </label>
-              <div class="col-sm-8">
-                <input id="pickupDate" name="Pickup Date" className="form-control" type="date" required />
+              <div className="col-sm-8">
+                <input
+                  id="pickupDate"
+                  name="Pickup Date"
+                  className="form-control"
+                  type="date"
+                  value={pickupDateInputValue}
+                  onChange={(e) => setPickupDateInputValue(e.target.value)}
+                  required
+                />
               </div>
             </div>
         </div>
         <div className="row w-50 mx-auto mb-2 d-flex align-items-center">
-            <div class="mb-3 row">
-              <label for="staticEmail" class="col-sm-4 col-form-label small fw-bolder">General pickup notes</label>
-              <div class="col-sm-8">
+            <div className="mb-3 row">
+              <label className="col-sm-4 col-form-label small fw-bolder">General pickup notes</label>
+              <div className="col-sm-8">
                 <input id="notes" className="form-control" type="text" placeholder="Notes about orders" aria-label="default input example" />
               </div>
             </div>
@@ -407,9 +413,14 @@ const OrderTable = () => {
                             <h4>REQUESTS</h4>
                         </div>
                         <div className="col-sm-4">
-                        <button type="button" className="btn btn-sm btn-primary add-new" onClick={handleAddOrder}>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-primary add-new"
+                            onClick={handleAddOrder}
+                            disabled={pickupDateInputValue === ''}
+                          >
                             <i className="bi bi-plus"></i> Add New Request
-                        </button>
+                          </button>
                         </div>
                     </div>
                 </div>

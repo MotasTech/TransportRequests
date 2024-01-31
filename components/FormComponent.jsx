@@ -31,27 +31,27 @@ function FormComponent() {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <div class="container">
-          <div class="row mb-3">
-            <div class="col">
-            <label class="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
+        <div className="container">
+          <div className="row mb-3">
+            <div className="col">
+            <label className="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
                 PASSCODE
               </label>
-              <input class="form-control" type="text" placeholder="Company Passcode" aria-label="default input example" disabled />
+              <input className="form-control" type="text" placeholder="Company Passcode" aria-label="default input example" disabled />
             </div>
-            <div class="col">
-              <label class="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
+            <div className="col">
+              <label className="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
                 YOUR COMPANY
               </label>
-              <input class="form-control" type="text" placeholder="Default input" aria-label="default input example" />
+              <input className="form-control" type="text" placeholder="Default input" aria-label="default input example" />
             </div>
           </div>
-          <div class="row mb-4">
-            <label class="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
+          <div className="row mb-4">
+            <label className="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
               DESTINATION
             </label>
             <input
-              class="form-control form-control-lg"
+              className="form-control form-control-lg"
               list="datalistOptions"
               id="exampleDataList"
               placeholder="Type to search..."
@@ -64,38 +64,38 @@ function FormComponent() {
                 <option value="KAI Cannabis Grow">AU-G-C-000299</option>
               </optgroup>
             </datalist>
-            <div id="buyerSearchHelp" class="form-text">
+            <div id="buyerSearchHelp" className="form-text">
               Search buyer by name or license number
             </div>
           </div>
-          <div class="row mb-3">
-            <select class="form-select form-select-sm" aria-label="Default select example">
+          <div className="row mb-3">
+            <select className="form-select form-select-sm" aria-label="Default select example">
               <option selected>Payment Terms</option>
               <option value="1">COD</option>
               <option value="2">NO COD</option>
               <option value="3">UP TO CUSTOMER</option>
             </select>
           </div>
-          <div class="row mb-3">
-            <select class="form-select form-select-sm" aria-label="Default select example">
+          <div className="row mb-3">
+            <select className="form-select form-select-sm" aria-label="Default select example">
               <option selected>Order Size</option>
               <option value="1">Bins</option>
               <option value="2">Boxes</option>
               <option value="3">Other</option>
             </select>
           </div>
-          <div class="row mb-3">
-            <label class="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
+          <div className="row mb-3">
+            <label className="form-label form-label-sm ps-0 fw-bolder text-muted" for="flexRadioDefault1">
               BUYER ADDRESS
             </label>
             <input
-              class="form-control"
+              className="form-control"
               type="text"
               placeholder="Default input"
               aria-label="default input example"
             />
           </div>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" className="btn btn-primary">
             Submit Order
           </button>
         </div>
