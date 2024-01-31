@@ -399,7 +399,7 @@ const OrderTable = () => {
             <div className="mb-3 row">
               <label className="col-sm-4 col-form-label small fw-bolder">General pickup notes</label>
               <div className="col-sm-8">
-                <input id="notes" className="form-control" type="text" placeholder="Notes about orders" aria-label="default input example" />
+                <input id="notes" className="form-control" type="text" placeholder="Notes about pickup" aria-label="default input example" />
               </div>
             </div>
         </div>
@@ -415,7 +415,7 @@ const OrderTable = () => {
                         </div>
                         <div className="col-sm-4">
                           <Tooltip 
-                            title="Please enter a Pickup Date to add new orders"
+                            title="** Please enter a Pickup Date to add new orders **"
                             placement="top-start"
                           >
                             <span> {/* Tooltip does not work directly on disabled elements, so we use a span wrapper */}
