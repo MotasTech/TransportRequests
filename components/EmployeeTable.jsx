@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Tooltip from '@mui/material/Tooltip';
 
 const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS_ENDPOINT;
 const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
@@ -413,14 +414,21 @@ const OrderTable = () => {
                             <h4>REQUESTS</h4>
                         </div>
                         <div className="col-sm-4">
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-primary add-new"
-                            onClick={handleAddOrder}
-                            disabled={pickupDateInputValue === ''}
+                          <Tooltip 
+                            title="Please enter a Pickup Date to add new orders"
+                            placement="top-start"
                           >
-                            <i className="bi bi-plus"></i> Add New Request
-                          </button>
+                            <span> {/* Tooltip does not work directly on disabled elements, so we use a span wrapper */}
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${pickupDateInputValue === '' ? 'btn-light' : 'btn-primary'} add-new`}
+                              onClick={handleAddOrder}
+                              disabled={pickupDateInputValue === ''}
+                            >
+                              <i className="bi bi-plus"></i> Add New Request
+                            </button>
+                            </span>
+                            </Tooltip>
                         </div>
                     </div>
                 </div>
