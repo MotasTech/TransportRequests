@@ -5,6 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import EmployeeTable from '../components/EmployeeTable';
 import { Raleway } from 'next/font/google'
 
+// beginning font
 const raleway = Raleway({ 
   subsets: ['latin'],
   weight: ['400', '700'],
