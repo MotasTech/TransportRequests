@@ -1,6 +1,6 @@
 import axios from 'axios'; // Import Axios
 
-// pages/api/logRFID.js
+// pages/api/logRFID.js point
 const GOOGLE_RFID_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_RFID_ENDPOINT;
 
 export default function handler(req, res) {
