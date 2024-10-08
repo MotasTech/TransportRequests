@@ -11,7 +11,18 @@ export default function handler(req, res) {
 
     // If the reader parameter exists, add it to the payload
     if (reader) {
-      req.body.Reader = reader; // Add Reader to the payload
+      if (Array.isArray(req.body)) {
+        // If req.body is an array, add 'Reader' to each element
+        req.body = req.body.map(item => {
+          if (typeof item === 'object' && item !== null) {
+            return { ...item, Reader: reader };
+          }
+          return item;
+        });
+      } else if (typeof req.body === 'object' && req.body !== null) {
+        // If req.body is an object, just add 'Reader' as a key-value pair
+        req.body.Reader = reader;
+      }
     }
 
     axios.post(GOOGLE_RFID_ENDPOINT, req.body)
