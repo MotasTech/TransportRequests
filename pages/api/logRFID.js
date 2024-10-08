@@ -13,9 +13,9 @@ export default function handler(req, res) {
     // If the reader parameter exists, add it to the payload
     if (Array.isArray(req.body)) {
       // data
-      var requestBody = {};
+      var requestBody = { type: "data", data: {}};
       req.body.forEach(obj => {
-        requestBody[obj.data.idHex] = {
+        requestBody.data[obj.data.idHex] = {
           'timestamp': obj.timestamp,
           'reader': reader
         }
@@ -23,12 +23,15 @@ export default function handler(req, res) {
     } else {
       // heartbeat
       var requestBody = {
-        'timestamp': req.body.timestamp,
-        'reader': reader,
-        'antenna1': req.body.data.radio_control.antennas['1'],
-        'antenna2': req.body.data.radio_control.antennas['2'],
-        'antenna3': req.body.data.radio_control.antennas['3'],
-        'antenna4': req.body.data.radio_control.antennas['4']
+        'type': 'heartbeat',
+        'data': {
+          'timestamp': req.body.timestamp,
+          'reader': reader,
+          'antenna1': req.body.data.radio_control.antennas['1'],
+          'antenna2': req.body.data.radio_control.antennas['2'],
+          'antenna3': req.body.data.radio_control.antennas['3'],
+          'antenna4': req.body.data.radio_control.antennas['4']
+        }
       }
     }
 
