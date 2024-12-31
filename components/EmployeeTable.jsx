@@ -336,27 +336,45 @@ const OrderTable = () => {
 
   // Load datalist options from an endpoint when the component mounts
   useEffect(() => {
+    let retries = 0;               // how many times we've retried
+    const maxRetries = 5;          // the maximum number of retry attempts
+    const retryDelay = 2000;       // delay (ms) before the next retry attempt
+    
     const fetchDestinationsData = async () => {
       try {
-        // Make an API request to fetch the datalist options
         const response = await fetch(GOOGLE_DESTINATIONS_ENDPOINT);
-        if (response.ok) {
-          const data = await response.json();
 
-          // Sort the data based on column 1 (destination) before setting it in state
-          const sortedData = data.sort((a, b) => a[0].localeCompare(b[0]));
-
-          setDatalistOptions(sortedData); // Update the datalist options with the data from the API response
-        } else {
-          console.error('Failed to fetch datalist options');
+        // If the response fails or not OK, throw an error so we go to the catch block
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        // Attempt to parse JSON
+        const data = await response.json();
+
+        // Sort the data by the first column (destination)
+        const sortedData = data.sort((a, b) => a[0].localeCompare(b[0]));
+
+        // Update the datalist options
+        setDatalistOptions(sortedData);
       } catch (error) {
         console.error('Error fetching datalist options:', error);
+
+        // If we haven't reached max retries, schedule another attempt
+        if (retries < maxRetries) {
+          retries += 1;
+          console.log(`Retrying fetch... Attempt #${retries}`);
+          setTimeout(fetchDestinationsData, retryDelay);
+        } else {
+          // If we've reached max retries, handle it (show error UI, etc.)
+          console.error(`Failed after ${maxRetries} retry attempts.`);
+        }
       }
     };
 
-    fetchDestinationsData(); // Call the fetchDestinationsData function when the component mounts
-  }, []); // The empty dependency array ensures this effect runs once on mount
+    fetchDestinationsData();
+
+  }, []);
 
 
 
