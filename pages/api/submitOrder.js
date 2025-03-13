@@ -1,7 +1,6 @@
 import axios from 'axios'; // Import Axios
 
 // pages/api/submitOrder.js
-//const GOOGLE_ENDPOINT = 'https://script.google.com/macros/s/AKfycby6h7JvK09kph_-NOdrca6AFrMfr2hJRxdC3-Tt8C87k5UK4vRqCqvX3Mt7GbiVzlbn/exec?email=Yes';
 const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
 const SEND_EMAIL = process.env.NEXT_PUBLIC_SEND_EMAIL;
 
