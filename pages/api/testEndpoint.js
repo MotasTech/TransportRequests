@@ -1,7 +1,7 @@
 import axios from 'axios'; // Import Axios
 
 <<<<<<< HEAD
-// this just serves as a test endpoint I can see so I can see the payload in logs in vercel 
+// this just serves as a test endpoint I can see so I can see the payload in logs in vercel to
 =======
 >>>>>>> origin/main
 export default function handler(req, res) {
