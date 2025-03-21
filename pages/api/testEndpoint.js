@@ -1,6 +1,9 @@
 import axios from 'axios'; // Import Axios
 
+<<<<<<< HEAD
 // this just serves as a test endpoint I can see so I can see the payload in logs in vercel 
+=======
+>>>>>>> origin/main
 export default function handler(req, res) {
   if (req.method === 'POST') {
     console.log('testEndpoint',JSON.stringify(req.body));
