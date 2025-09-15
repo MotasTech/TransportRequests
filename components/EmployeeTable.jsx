@@ -4,6 +4,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS_ENDPOINT;
 const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
+console.log({GOOGLE_DESTINATIONS_ENDPOINT,GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT});
 
 const OrderTable = () => {
   const router = useRouter(); // Initialize the router
