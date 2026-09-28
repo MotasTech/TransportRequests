@@ -2,15 +2,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Tooltip from '@mui/material/Tooltip';
 
-const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS_ENDPOINT;
-const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
-console.log({GOOGLE_DESTINATIONS_ENDPOINT,GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT});
-
 const GOOGLE_REQUEST_TIMEOUT_MS = 30000;
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-// Google Apps Script ContentService responses use a one-time redirect URL.
-// Retry the original /exec URL so Google creates a fresh redirect each time.
+// Retry the same-origin API route when the server or Google Sheets API is temporarily unavailable.
 const fetchJsonWithRetry = async (url, { label, maxAttempts = 5 } = {}) => {
   let lastError;
 
@@ -120,7 +115,7 @@ const OrderTable = () => {
 
     try {
       const data = await fetchJsonWithRetry(
-        `${GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT}?type=passcodes&code=chris`,
+        '/api/passcodes',
         { label: 'Company lookup' }
       );
       const companyData = data.slice(1); // Exclude the header row
@@ -405,12 +400,19 @@ const OrderTable = () => {
 
       try {
         const data = await fetchJsonWithRetry(
-          GOOGLE_DESTINATIONS_ENDPOINT,
+          '/api/destinations',
           { label: 'Destinations lookup' }
         );
 
-        // Sort the data by the first column (destination)
-        const sortedData = data.sort((a, b) => a[0].localeCompare(b[0]));
+        if (!Array.isArray(data)) {
+          throw new Error('Destination data was not returned as an array');
+        }
+
+        // Google Sheets can return blank/ragged rows. Only destination rows
+        // with a value in column A should appear in the lookup list.
+        const sortedData = data
+          .filter((row) => Array.isArray(row) && row[0] != null && String(row[0]).trim() !== '')
+          .sort((a, b) => String(a[0]).localeCompare(String(b[0]), undefined, { sensitivity: 'base' }));
 
         // Update the datalist options
         if (isMounted) setDatalistOptions(sortedData);
