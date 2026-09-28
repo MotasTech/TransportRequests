@@ -4,6 +4,47 @@ import Tooltip from '@mui/material/Tooltip';
 
 const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS_ENDPOINT;
 const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
+console.log({GOOGLE_DESTINATIONS_ENDPOINT,GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT});
+
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+// Google Apps Script ContentService responses use a one-time redirect URL.
+// Retry the original /exec URL so Google creates a fresh redirect each time.
+const fetchJsonWithRetry = async (url, { label, maxAttempts = 5 } = {}) => {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const separator = url.includes('?') ? '&' : '?';
+    const retryUrl = `${url}${separator}_retry=${attempt}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+    try {
+      const response = await fetch(retryUrl, {
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === maxAttempts) break;
+
+      const delay = Math.min(1000 * (2 ** (attempt - 1)), 8000) + Math.floor(Math.random() * 250);
+      console.warn(`${label || 'Google request'} failed on attempt ${attempt}/${maxAttempts}; retrying in ${delay}ms`, error);
+      await wait(delay);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  throw lastError || new Error(`${label || 'Google request'} failed`);
+};
 
 const OrderTable = () => {
   const router = useRouter(); // Initialize the router
@@ -56,27 +97,25 @@ const OrderTable = () => {
 
 
   const fetchCompanyByPasscode = async (passcode) => {
+    if (!passcode) {
+      setCompany('');
+      return;
+    }
+
     try {
-      const response = await fetch(`${GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT}?type=passcodes&code=chris`);
-      if (response.ok) {
-        const data = await response.json();
-        const companyData = data.slice(1); // Exclude the header row
-        
-        // Find the row with the matching passcode in column 1
-        const matchingRow = companyData.find((row) => row[1] === passcode);
-  
-        if (matchingRow) {
-          // If a valid company is found, update the 'company' state with the corresponding value in column 2
-          setCompany(matchingRow[0]);
-        } else {
-          // If no company is found, clear the 'company' state
-          setCompany('');
-        }
-      } else {
-        console.error('Failed to fetch company');
-      }
+      const data = await fetchJsonWithRetry(
+        `${GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT}?type=passcodes&code=chris`,
+        { label: 'Company lookup' }
+      );
+      const companyData = data.slice(1); // Exclude the header row
+
+      // Find the row with the matching passcode in column 1
+      const matchingRow = companyData.find((row) => row[1] === passcode);
+
+      setCompany(matchingRow ? matchingRow[0] : '');
     } catch (error) {
-      console.error('Error:', error);
+      setCompany('');
+      console.error('Failed to fetch company after retries:', error);
     }
   };
 
@@ -322,35 +361,29 @@ const OrderTable = () => {
 
   // Function to get the value of the 'passcode' URL parameter
   useEffect(() => {
+    if (!router.isReady) return;
+
     const getPasscodeFromURL = () => {
-      const { passcode } = router.query; // Get the 'passcode' parameter from the URL
-      return passcode || ''; // If 'passcode' exists, return its value; otherwise, return an empty string
+      const { passcode, code } = router.query;
+      // Support the intended ?passcode=... format and the existing ?code=... links.
+      return passcode || code || '';
     };
 
     // Set the value of the 'passcode' state from the URL parameter
     const passcodeValue = getPasscodeFromURL();
     setPasscode(passcodeValue);
     fetchCompanyByPasscode(passcodeValue);
-  }, [router.query]); // Re-run this effect whenever the URL query parameters change
+  }, [router.isReady, router.query.passcode, router.query.code]); // Re-run when the URL query parameters are ready or change
 
 
   // Load datalist options from an endpoint when the component mounts
   useEffect(() => {
-    let retries = 0;               // how many times we've retried
-    const maxRetries = 5;          // the maximum number of retry attempts
-    const retryDelay = 2000;       // delay (ms) before the next retry attempt
-    
     const fetchDestinationsData = async () => {
       try {
-        const response = await fetch(GOOGLE_DESTINATIONS_ENDPOINT);
-
-        // If the response fails or not OK, throw an error so we go to the catch block
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        // Attempt to parse JSON
-        const data = await response.json();
+        const data = await fetchJsonWithRetry(
+          GOOGLE_DESTINATIONS_ENDPOINT,
+          { label: 'Destinations lookup' }
+        );
 
         // Sort the data by the first column (destination)
         const sortedData = data.sort((a, b) => a[0].localeCompare(b[0]));
@@ -358,17 +391,7 @@ const OrderTable = () => {
         // Update the datalist options
         setDatalistOptions(sortedData);
       } catch (error) {
-        console.error('Error fetching datalist options:', error);
-
-        // If we haven't reached max retries, schedule another attempt
-        if (retries < maxRetries) {
-          retries += 1;
-          console.log(`Retrying fetch... Attempt #${retries}`);
-          setTimeout(fetchDestinationsData, retryDelay);
-        } else {
-          // If we've reached max retries, handle it (show error UI, etc.)
-          console.error(`Failed after ${maxRetries} retry attempts.`);
-        }
+        console.error('Failed to fetch datalist options after retries:', error);
       }
     };
 
