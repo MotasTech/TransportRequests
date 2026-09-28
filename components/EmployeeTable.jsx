@@ -6,6 +6,7 @@ const GOOGLE_DESTINATIONS_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_DESTINATIONS
 const GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT = process.env.NEXT_PUBLIC_GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT;
 console.log({GOOGLE_DESTINATIONS_ENDPOINT,GOOGLE_ORDERS_AND_PASSCODE_ENDPOINT});
 
+const GOOGLE_REQUEST_TIMEOUT_MS = 30000;
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 // Google Apps Script ContentService responses use a one-time redirect URL.
@@ -17,7 +18,8 @@ const fetchJsonWithRetry = async (url, { label, maxAttempts = 5 } = {}) => {
     const separator = url.includes('?') ? '&' : '?';
     const retryUrl = `${url}${separator}_retry=${attempt}`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), GOOGLE_REQUEST_TIMEOUT_MS);
+    let shouldRetry = false;
 
     try {
       const response = await fetch(retryUrl, {
@@ -33,13 +35,15 @@ const fetchJsonWithRetry = async (url, { label, maxAttempts = 5 } = {}) => {
     } catch (error) {
       lastError = error;
 
-      if (attempt === maxAttempts) break;
-
-      const delay = Math.min(1000 * (2 ** (attempt - 1)), 8000) + Math.floor(Math.random() * 250);
-      console.warn(`${label || 'Google request'} failed on attempt ${attempt}/${maxAttempts}; retrying in ${delay}ms`, error);
-      await wait(delay);
+      shouldRetry = attempt < maxAttempts;
     } finally {
       clearTimeout(timeoutId);
+    }
+
+    if (shouldRetry) {
+      const delay = Math.min(1000 * (2 ** (attempt - 1)), 8000) + Math.floor(Math.random() * 250);
+      console.warn(`${label || 'Google request'} failed on attempt ${attempt}/${maxAttempts}; retrying in ${delay}ms`, lastError);
+      await wait(delay);
     }
   }
 
@@ -65,6 +69,13 @@ const OrderTable = () => {
   const [alertType, setAlertType] = useState('success'); // 'success' or 'error'
   const [alertMessage, setAlertMessage] = useState(''); // alert for submission
   const [pickupDateInputValue, setPickupDateInputValue] = useState('');
+  const [isLoadingCompany, setIsLoadingCompany] = useState(false);
+  const [isLoadingDestinations, setIsLoadingDestinations] = useState(true);
+  const [companyError, setCompanyError] = useState('');
+  const [destinationsError, setDestinationsError] = useState('');
+
+  const isFetchingRequiredData = isLoadingCompany || isLoadingDestinations;
+  const requiredDataError = companyError || destinationsError;
 
 
   // Function to show the alert for a specified duration
@@ -99,8 +110,13 @@ const OrderTable = () => {
   const fetchCompanyByPasscode = async (passcode) => {
     if (!passcode) {
       setCompany('');
+      setCompanyError('');
+      setIsLoadingCompany(false);
       return;
     }
+
+    setIsLoadingCompany(true);
+    setCompanyError('');
 
     try {
       const data = await fetchJsonWithRetry(
@@ -115,7 +131,10 @@ const OrderTable = () => {
       setCompany(matchingRow ? matchingRow[0] : '');
     } catch (error) {
       setCompany('');
+      setCompanyError('We could not fetch the required company information yet.');
       console.error('Failed to fetch company after retries:', error);
+    } finally {
+      setIsLoadingCompany(false);
     }
   };
 
@@ -378,7 +397,12 @@ const OrderTable = () => {
 
   // Load datalist options from an endpoint when the component mounts
   useEffect(() => {
+    let isMounted = true;
+
     const fetchDestinationsData = async () => {
+      setIsLoadingDestinations(true);
+      setDestinationsError('');
+
       try {
         const data = await fetchJsonWithRetry(
           GOOGLE_DESTINATIONS_ENDPOINT,
@@ -389,20 +413,48 @@ const OrderTable = () => {
         const sortedData = data.sort((a, b) => a[0].localeCompare(b[0]));
 
         // Update the datalist options
-        setDatalistOptions(sortedData);
+        if (isMounted) setDatalistOptions(sortedData);
       } catch (error) {
+        if (isMounted) {
+          setDestinationsError('We could not fetch the required destination information yet.');
+        }
         console.error('Failed to fetch datalist options after retries:', error);
+      } finally {
+        if (isMounted) setIsLoadingDestinations(false);
       }
     };
 
     fetchDestinationsData();
 
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
 
 
   return (
     <div className="container mt-2">
+        {isFetchingRequiredData && (
+          <div className="alert alert-info d-flex align-items-center justify-content-center" role="status" aria-live="polite">
+            <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+            <span>Fetching required information. This may take a moment...</span>
+          </div>
+        )}
+
+        {requiredDataError && !isFetchingRequiredData && (
+          <div className="alert alert-warning text-center" role="alert">
+            <div>We could not fetch the required information yet. Please try again.</div>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-warning mt-2"
+              onClick={() => window.location.reload()}
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
         <form>
         <div className="row w-50 mx-auto mb-4">
             <div className="col col-auto">
