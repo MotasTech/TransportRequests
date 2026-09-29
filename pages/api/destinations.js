@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     const filteredValues = values
       .filter((row) => {
         const firstColumnValue = String(row[0] ?? '').trim();
-        const searchableValue = String(row[SEARCHABLE_CUSTOMER_NAME_COLUMN - 1] ?? '')
+        const searchableValue = String(row[SEARCHABLE_CUSTOMER_NAME_COLUMN] ?? '')
           .trim()
           .toLowerCase();
 
