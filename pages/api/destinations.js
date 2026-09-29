@@ -42,11 +42,12 @@ export default async function handler(req, res) {
 
     const filteredValues = values
       .filter((row) => {
+        const firstColumnValue = String(row[0] ?? '').trim();
         const searchableValue = String(row[SEARCHABLE_CUSTOMER_NAME_COLUMN - 1] ?? '')
           .trim()
           .toLowerCase();
 
-        return searchableValue !== '' && !searchableValue.includes('no');
+        return firstColumnValue !== '' && !searchableValue.includes('no');
       })
       .map((row) => row.slice(0, 4));
 
