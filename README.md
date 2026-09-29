@@ -36,6 +36,6 @@ The Apps Script worker in [`apps-script/EmailQueue.gs`](apps-script/EmailQueue.g
 In the spreadsheet's bound Apps Script project:
 
 1. Copy `apps-script/EmailQueue.gs` into the project.
-2. Run `setupRequestEmailQueue` once and authorize the script. It creates the `Email Sent` header and unchecked checkboxes in column `T`. Run this before processing live rows because it resets the checkbox range.
-3. Run `createRequestEmailTrigger` once. It creates the five-minute time-driven trigger.
+2. Create a time-driven trigger for `processPendingRequestEmails` at the interval you want.
+3. Run `previewLatestRequestEmail` to view the newest email without sending it. After a new unchecked row exists, `previewPendingRequestEmail` previews the first grouped pending batch.
 4. Ensure the Apps Script runs under the Google account that should send the email. No Gmail API service account is required.
