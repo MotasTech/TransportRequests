@@ -30,14 +30,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    if (!Number.isInteger(SEARCHABLE_CUSTOMER_NAME_COLUMN) || SEARCHABLE_CUSTOMER_NAME_COLUMN < 1) {
-      throw new Error('SEARCHABLE_CUSTOMER_NAME_COLUMN must be a positive 1-based column number');
+    if (!Number.isInteger(SEARCHABLE_CUSTOMER_NAME_COLUMN) || SEARCHABLE_CUSTOMER_NAME_COLUMN < 0) {
+      throw new Error('SEARCHABLE_CUSTOMER_NAME_COLUMN must be a non-negative 0-based JavaScript column index');
     }
 
     const values = await getSheetValues({
       spreadsheetId: SPREADSHEET_ID,
       sheetName: SHEET_NAME,
-      columns: `A:${columnNumberToLetter(SEARCHABLE_CUSTOMER_NAME_COLUMN)}`,
+      columns: `A:${columnNumberToLetter(SEARCHABLE_CUSTOMER_NAME_COLUMN + 1)}`,
     });
 
     const filteredValues = values

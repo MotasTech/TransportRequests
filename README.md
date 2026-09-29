@@ -25,6 +25,6 @@ Put the output in `.env` as a single quoted value:
 GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account", ... }'
 ```
 
-The destination worksheet name is optional; if `GOOGLE_DESTINATIONS_SHEET_NAME` is blank, the first worksheet in that spreadsheet is used. `SEARCHABLE_CUSTOMER_NAME_COLUMN` is a 1-based column number and defaults to `17` (`Q`); rows with a value containing `No` in that column are excluded from the customer lookup, while blank or null values remain eligible. The requests and passcodes tabs default to `Requests` and `Passcodes`.
+The destination worksheet name is optional; if `GOOGLE_DESTINATIONS_SHEET_NAME` is blank, the first worksheet in that spreadsheet is used. `SEARCHABLE_CUSTOMER_NAME_COLUMN` is a 0-based JavaScript column index and defaults to `17` (`R`; use `16` for `Q`); rows with a value containing `No` in that column are excluded from the customer lookup, while blank or null values remain eligible. The requests and passcodes tabs default to `Requests` and `Passcodes`.
 
 The service-account migration writes orders to Sheets but does not send the email that was previously triggered by the Apps Script. Email delivery requires a separate provider or Gmail API/domain-wide delegation setup.
