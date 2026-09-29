@@ -7,7 +7,7 @@ const SPREADSHEET_ID = process.env.GOOGLE_ORDERS_SPREADSHEET_ID;
 const SHEET_NAME = process.env.GOOGLE_REQUESTS_SHEET_NAME || 'Requests';
 
 function buildRequestRows(data) {
-  const now = new Date().toISOString();
+  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
   return data.orders.map((order) => {
     const isLayover = data.pickupDate !== order.deliveryDate ? 'PU' : 'PSD';
@@ -60,6 +60,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       added: rows.length,
+      emailQueued: true,
     });
   } catch (error) {
     console.error('Failed to append order to Google Sheets:', getGoogleSheetsErrorMessage(error));

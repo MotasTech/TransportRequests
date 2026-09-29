@@ -27,4 +27,15 @@ GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account", ... }'
 
 The destination worksheet name is optional; if `GOOGLE_DESTINATIONS_SHEET_NAME` is blank, the first worksheet in that spreadsheet is used. `SEARCHABLE_CUSTOMER_NAME_COLUMN` is a 0-based JavaScript column index and defaults to `17` (`R`; use `16` for `Q`); rows with a value containing `No` in that column are excluded from the customer lookup, while blank or null values remain eligible. The requests and passcodes tabs default to `Requests` and `Passcodes`.
 
-The service-account migration writes orders to Sheets but does not send the email that was previously triggered by the Apps Script. Email delivery requires a separate provider or Gmail API/domain-wide delegation setup.
+## Confirmation email queue
+
+The Next.js API writes request data to columns `A:S`. Column `T` is reserved for an `Email Sent` checkbox and is left untouched by the service-account writer, so newly appended rows remain unchecked/pending.
+
+The Apps Script worker in [`apps-script/EmailQueue.gs`](apps-script/EmailQueue.gs) groups pending rows by shipper/company, sends one confirmation digest per shipper, and checks the rows only after `MailApp` accepts the email. It relies on the existing `getCustomerEmails`, `sendEmail`, and `ORDERS_SHEET_NAME` definitions from `Email.gs`/`Code.gs`.
+
+In the spreadsheet's bound Apps Script project:
+
+1. Copy `apps-script/EmailQueue.gs` into the project.
+2. Run `setupRequestEmailQueue` once and authorize the script. It creates the `Email Sent` header and unchecked checkboxes in column `T`. Run this before processing live rows because it resets the checkbox range.
+3. Run `createRequestEmailTrigger` once. It creates the five-minute time-driven trigger.
+4. Ensure the Apps Script runs under the Google account that should send the email. No Gmail API service account is required.
